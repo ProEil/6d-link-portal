@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6D 網址傳送門</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;800&family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page-bg: #FFF8EF;
+    --surface: #FFFFFF;
+    --ink: #4A3F38;
+    --ink-soft: #8A7E73;
+    --border: #EFE3D3;
+    --sky-top: #CDEBFA;
+    --sky-bot: #EAF7FE;
+    --grass: #BFE3B8;
+    --wood: #D8AE7E;
+    --wood-dark: #B98A57;
+    --focus: #5B8FBF;
+    --font-display: 'Chiron GoRound TC', 'Noto Serif TC', 'Songti TC', serif;
+    --font-body: 'Chiron GoRound TC', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page-bg: #23201C; --surface: #2E2A25; --ink: #F1E9DE; --ink-soft: #B8AC9E;
+      --border: #433C34; --sky-top: #22384A; --sky-bot: #1B2A36; --grass: #35502E;
+      --wood: #7A5C3B; --wood-dark: #5E4429; --focus: #8FB6DE;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #23201C; --surface: #2E2A25; --ink: #F1E9DE; --ink-soft: #B8AC9E;
+    --border: #433C34; --sky-top: #22384A; --sky-bot: #1B2A36; --grass: #35502E;
+    --wood: #7A5C3B; --wood-dark: #5E4429; --focus: #8FB6DE;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--page-bg); color: var(--ink); font-family: var(--font-body); -webkit-text-size-adjust: 100%; }
+  body { min-height: 100vh; }
+  img, svg { display: block; max-width: 100%; }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 0 60px; }
+
+  .banner { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--sky-top), var(--sky-bot)); padding-top: 34px; }
+  .sun { position: absolute; top: 22px; right: 34px; width: 46px; height: 46px; border-radius: 50%; background: #FBDD7E; box-shadow: 0 0 0 8px rgba(251,221,126,0.35); }
+  .cloud { position: absolute; background: #fff; border-radius: 40px; opacity: .9; }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+  .c1 { width: 60px; height: 20px; top: 30px; left: 26px; }
+  .c1::before { width: 26px; height: 26px; top: -12px; left: 6px; }
+  .c1::after { width: 20px; height: 20px; top: -8px; left: 30px; }
+  .c2 { width: 44px; height: 16px; top: 66px; left: 130px; opacity: .7; }
+  .c2::before { width: 18px; height: 18px; top: -9px; left: 6px; }
+  .c2::after { width: 14px; height: 14px; top: -6px; left: 22px; }
+  .hill { display: block; width: 100%; height: auto; margin-top: 26px; }
+  .critters { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; justify-content: center; gap: 46px; pointer-events: none; }
+  .critters .critter { width: 40px; height: 40px; opacity: .95; }
+  .critters .critter:nth-child(2) { transform: translateY(6px); }
+
+  .signboard { position: relative; display: flex; justify-content: center; margin: -8px 0 0; padding-bottom: 30px; }
+  .board { position: relative; background: var(--wood); border: 3px solid var(--wood-dark); border-radius: 14px; padding: 16px 26px 18px; max-width: 86%; text-align: center; box-shadow: 0 6px 0 rgba(0,0,0,.08); }
+  .board::before, .board::after { content: ""; position: absolute; top: -22px; width: 3px; height: 24px; background: var(--wood-dark); }
+  .board::before { left: 22%; transform: rotate(-4deg); }
+  .board::after { right: 22%; transform: rotate(4deg); }
+  .board h1 { font-family: var(--font-display); font-weight: 700; color: #fff; font-size: clamp(21px, 4.6vw, 28px); margin: 0 0 4px; text-shadow: 0 1px 0 rgba(0,0,0,.15); }
+  .board p { margin: 0; color: #FFF6E6; font-size: 13.5px; line-height: 1.5; }
+
+  .jumprow { display: flex; gap: 14px; overflow-x: auto; padding: 18px 20px 6px; justify-content: center; flex-wrap: wrap; }
+  .jumpbtn { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; font-family: var(--font-body); color: var(--ink-soft); font-size: 12px; padding: 4px; }
+  .jumpbtn .jicon { width: 46px; height: 46px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); padding: 6px; }
+  .jumpbtn:hover .jicon, .jumpbtn:focus-visible .jicon { border-color: var(--focus); }
+
+  section.subject { margin: 30px 0 0; scroll-margin-top: 14px; }
+  .subject-head { display: flex; align-items: center; gap: 14px; padding: 0 20px; margin-bottom: 14px; }
+  .subject-head .micon { width: 56px; height: 56px; border-radius: 50%; background: var(--surface); border: 3px solid var(--cat-accent, var(--focus)); padding: 7px; flex: 0 0 auto; }
+  .subject-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 21px; margin: 0; color: var(--cat-accent, var(--ink)); }
+
+  .cards { display: grid; grid-template-columns: 1fr; gap: 16px; padding: 0 20px; }
+  @media (min-width: 720px) { .cards { grid-template-columns: 1fr 1fr; } }
+
+  .card { display: flex; align-items: center; gap: 14px; min-height: 64px; text-decoration: none; border: none; border-radius: 20px; padding: 14px 16px; background: var(--cat-bg, #EFEFEF); box-shadow: 0 3px 0 rgba(0,0,0,.05), 0 6px 14px rgba(0,0,0,.06); cursor: pointer; transition: transform .1s ease, box-shadow .1s ease; }
+  .card:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.05), 0 3px 8px rgba(0,0,0,.06); }
+  .card:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .card-icon { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.65); padding: 6px; }
+  .card-body { min-width: 0; flex: 1 1 auto; }
+  .card-title { font-family: var(--font-body); font-weight: 700; font-size: 17px; color: var(--ink); margin: 0 0 2px; line-height: 1.35; }
+  .card-desc { font-size: 13px; color: var(--ink-soft); margin: 0 0 3px; line-height: 1.5; }
+  .card-host { font-size: 11px; color: var(--ink-soft); opacity: .75; }
+  .card-wrap { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; padding: 10px; background: var(--cat-bg, #EFEFEF); box-shadow: 0 3px 0 rgba(0,0,0,.05), 0 6px 14px rgba(0,0,0,.06); }
+  .card-wrap .card { box-shadow: none; background: transparent; padding: 6px 6px 2px; }
+  .card-wrap .card:active { box-shadow: none; }
+  .card-more { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 6px 6px; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 8px 18px; border-radius: 24px; background: rgba(255,255,255,.75); color: var(--ink); font-family: var(--font-body); font-weight: 700; font-size: 14.5px; text-decoration: none; border: 2px solid var(--cat-accent, var(--focus)); box-shadow: 0 2px 0 rgba(0,0,0,.05); }
+  .pill:active { transform: translateY(2px); box-shadow: none; }
+  .pill:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .empty { grid-column: 1 / -1; color: var(--ink-soft); font-size: 14px; padding: 4px 2px; }
+
+  .footer-note { text-align: center; margin-top: 30px; font-size: 12.5px; color: var(--ink-soft); opacity: .85; padding: 0 20px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* ---- cute layer ---- */
+  body { background-image: radial-gradient(rgba(0,0,0,.05) 2px, transparent 2.6px); background-size: 26px 26px; }
+  .banner { padding-top: 44px; }
+  .banner::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 28px; z-index: 2; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='28'%3E%3Cpath d='M0 2h96' stroke='%23B98A57' stroke-width='2'/%3E%3Cpath d='M4 3h20l-10 22z' fill='%23F28B82'/%3E%3Cpath d='M36 3h20l-10 22z' fill='%23FBD26A'/%3E%3Cpath d='M68 3h20l-10 22z' fill='%238FCB9B'/%3E%3C/svg%3E") repeat-x; background-size: 96px 28px; }
+  .sun { animation: pulse 4s ease-in-out infinite; }
+  .cloud { animation: drift 9s ease-in-out infinite alternate; }
+  .c2 { animation-delay: -4s; }
+  .sky-decor { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+  .sky-decor .float { position: absolute; font-size: 22px; animation: floaty 4.5s ease-in-out infinite alternate; }
+  .ground-decor { position: relative; display: flex; justify-content: space-around; height: 26px; margin-top: -26px; font-size: 20px; pointer-events: none; z-index: 1; }
+  .critters .critter { animation: hop 2.4s ease-in-out infinite; }
+  .critters .critter:nth-child(2) { animation-delay: .5s; }
+  .critters .critter:nth-child(3) { animation-delay: 1s; }
+  .board { transform: rotate(-1deg); }
+  .board h1 { font-size: clamp(24px, 5.4vw, 34px); letter-spacing: .04em; }
+  section.subject { position: relative; isolation: isolate; margin: 34px 14px 0; padding: 18px 0 22px; }
+  section.subject::before { content: ""; position: absolute; inset: 0; background: var(--cat-bg); opacity: .45; border: 3px dashed var(--cat-accent); border-radius: 30px; z-index: -1; }
+  .subject-head h2 { background: var(--cat-accent); color: #fff; padding: 6px 18px; border-radius: 22px; font-size: 20px; text-shadow: 0 1px 1px rgba(0,0,0,.3); box-shadow: 0 3px 0 rgba(0,0,0,.12); }
+  .subject-head .micon { animation: bob 3s ease-in-out infinite; }
+  .card { border: 4px solid #fff; padding-right: 58px; position: relative; box-shadow: 0 5px 0 rgba(0,0,0,.08), 0 8px 16px rgba(0,0,0,.07); }
+  .card::after { content: ""; position: absolute; right: 14px; top: 50%; width: 30px; height: 30px; margin-top: -15px; border-radius: 50%; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath d='M12 9l9 6-9 6z' fill='white'/%3E%3C/svg%3E") center/100% no-repeat, var(--cat-accent, var(--focus)); }
+  .card-wrap .card::after { display: none; }
+  .card-wrap .card { border: none; padding-right: 6px; }
+  .cards > .card:active { transform: translateY(3px); }
+  .card-wrap { border: 4px solid #fff; }
+  .footer-note { font-family: var(--font-display); font-size: 15px; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 14px rgba(251,221,126,.2); } }
+  @keyframes drift { to { transform: translateX(26px); } }
+  @keyframes floaty { to { transform: translateY(10px) rotate(8deg); } }
+  @keyframes hop { 50% { transform: translateY(-7px); } }
+  @keyframes bob { 50% { transform: translateY(-4px) rotate(-3deg); } }
+  :root[data-portal-theme="ocean"] { --page-bg:#EEF8FB; --sky-top:#BFE6F5; --sky-bot:#E3F6FB; --grass:#F3D9A0; --wood:#C9A27A; --wood-dark:#9C7650; }
+  :root[data-portal-theme="candy"] { --page-bg:#FFF3F8; --sky-top:#FFD3E6; --sky-bot:#FFEAF3; --grass:#FFC4DA; --wood:#E79DBD; --wood-dark:#C46E96; }
+  :root[data-portal-theme="night"] { --page-bg:#F2EFFF; --sky-top:#262B66; --sky-bot:#4A4F9C; --grass:#3E6E5B; --wood:#8A6A4A; --wood-dark:#664A31; }
+  :root[data-portal-theme="night"] .sun { background: #FFF3C4; box-shadow: 0 0 0 8px rgba(255,243,196,.25); }
+  :root[data-portal-theme="night"] .cloud { opacity: .25; }
+  :root[data-portal-theme="autumn"] { --page-bg:#FFF5E8; --sky-top:#FFD9A8; --sky-bot:#FFEFD6; --grass:#E2BC74; --wood:#C98B55; --wood-dark:#9A6335; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+  /* ---- clean layout layer ---- */
+  [hidden] { display: none !important; }
+  :root { --title-ink: #2C5F46; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --title-ink: #BFE3B8; } }
+  :root[data-portal-theme="night"] { --title-ink: #fff; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .banner { padding: 0; height: 180px; display: flex; align-items: center; }
+  @media (max-width: 560px) { .banner { height: 166px; } }
+  .banner::before, .sky-decor, .ground-decor, .c2 { display: none; }
+  .hill { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 56px; margin: 0; }
+  .sun { width: 34px; height: 34px; top: 16px; right: 20px; }
+  .c1 { left: auto; right: 76px; top: 24px; }
+  .critters { left: auto; right: 14px; bottom: 12px; gap: 8px; justify-content: flex-end; }
+  .critters .critter { width: 30px; height: 30px; }
+  .signboard { position: relative; z-index: 2; margin: 0; padding: 0 24px; justify-content: flex-start; width: 100%; }
+  .board { background: none; border: none; box-shadow: none; padding: 0; text-align: left; max-width: 100%; transform: none; }
+  .board::before, .board::after { display: none; }
+  .board h1 { color: var(--title-ink); text-shadow: none; margin-bottom: 6px; }
+  .board p { color: var(--ink-soft); font-size: 14.5px; }
+  .searchwrap { padding: 16px 20px 4px; }
+  .sr { position: absolute; left: -9999px; }
+  #searchInput { width: 100%; min-height: 50px; font-family: var(--font-body); font-size: 16px; padding: 10px 18px; border: 2px solid var(--border); border-radius: 26px; background: var(--surface); color: var(--ink); }
+  #resultInfo { margin: 8px 6px 0; font-size: 13.5px; color: var(--ink-soft); }
+  .jumprow { position: sticky; top: 0; z-index: 20; flex-wrap: nowrap; justify-content: flex-start; padding: 10px 20px; gap: 10px; background: var(--page-bg); border-bottom: 1px solid var(--border); }
+  .jumpbtn { flex: 0 0 auto; flex-direction: row; gap: 8px; min-height: 50px; padding: 6px 16px 6px 8px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 26px; color: var(--ink); font-size: 15px; white-space: nowrap; }
+  .jumpbtn .jicon { width: 34px; height: 34px; padding: 4px; border: none; background: var(--cat-bg); }
+  section.subject { margin: 26px 0 0; padding: 0; scroll-margin-top: 80px; }
+  section.subject::before { display: none; }
+  .subject-head h2 { background: none; color: var(--ink); text-shadow: none; box-shadow: none; padding: 0; border-radius: 0; font-size: 21px; }
+  .subject-head .micon { animation: none; background: var(--cat-bg); border: none; }
+  .count { font-size: 13.5px; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 2px 10px; }
+  .cards { gap: 18px; }
+  .card { min-height: 96px; padding-top: 16px; padding-bottom: 16px; }
+  .card-wrap { padding: 6px; }
+  .card-wrap .card { border: none; box-shadow: none; min-height: 0; padding: 10px 8px 4px; }
+  .card-title { font-size: 18px; margin: 0 0 6px; }
+  .card-desc { font-size: 15px; line-height: 1.6; margin: 0 0 6px; }
+  .card-host { font-size: 12px; }
+  .cards .empty { border: 2px dashed var(--border); border-radius: 16px; padding: 18px; text-align: center; }
+  .noresult { text-align: center; color: var(--ink-soft); padding: 30px 20px; }
+  .totop { margin-top: 14px; min-height: 48px; padding: 8px 26px; border-radius: 26px; border: 1.5px solid var(--border); background: var(--surface); color: var(--ink); font-family: var(--font-body); font-size: 15px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section class="banner">
+    <div class="sun"></div>
+    <div class="sky-decor" id="skyDecor"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <svg class="hill" viewBox="0 0 800 90" preserveAspectRatio="none">
+      <path d="M0,45 C130,5 260,80 420,35 C580,-5 700,55 800,25 L800,90 L0,90 Z" fill="var(--grass)"/>
+    </svg>
+    <div class="ground-decor" id="groundDecor"></div>
+    <div class="critters" id="critters"></div>
+    <div class="signboard">
+      <div class="board">
+        <h1 id="siteTitle">6D 網址傳送門</h1>
+        <p id="siteSubtitle">6D Link Portal · 輕輕一按，前往今天要用的網站！</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="searchwrap">
+    <label class="sr" for="searchInput">找學習資源</label>
+    <input id="searchInput" type="search" placeholder="🔍 找學習資源，例如：詞語、成語、Padlet" autocomplete="off">
+    <p id="resultInfo" hidden></p>
+  </div>
+  <nav class="jumprow" id="jumprow"></nav>
+  <div id="sections"></div>
+  <p class="noresult" id="noResult" hidden>暫時找不到相關資源，請試試其他關鍵字。</p>
+
+  <p class="footer-note">祝大家學習愉快！🌈 每天進步一點點 ⭐</p>
+  <div style="text-align:center"><button class="totop" id="toTop" type="button">回到頁首</button></div>
+</div>
+
+<script id="site-data" type="application/json">
+{
+  "siteTitle": "6D 網址傳送門",
+  "siteSubtitle": "6D Link Portal · 輕輕一按，前往今天要用的網站！",
+  "categories": [
+    {
+      "id": "chi",
+      "name": "中文",
+      "mascot": "bear",
+      "links": [
+        {
+          "title": "詞語特派員：詞語任務所1",
+          "desc": "第一及第三課詞語練習",
+          "url": "https://tcpsmathtest.my.canva.site/cjxnscn7ta369qj5"
+        },
+        {
+          "title": "聖德蘭為甚麼選擇窮人？",
+          "desc": "延伸學習",
+          "url": "https://youtu.be/-D6xxDDEMLU?si=Q-78j7DpPwxl18pw",
+          "tip": " 聖德蘭為什麼選擇窮人？她的一生教會我們什麼｜Mother Teresa: Serving the Poorest of the Poor"
+        },
+        {
+          "title": "STAR練習",
+          "desc": "請於11月前登入edcity賬戶，完成兩個練習",
+          "url": "https://estar.edcity.hk/home/papers/"
+        },
+        {
+          "title": "詞語全接觸大冒險",
+          "desc": "第五、七、八課詞語練習",
+          "url": "https://tcpsmathtest.my.canva.site/cmxq6v1p3rzz7j2b"
+        }
+      ]
+    },
+    {
+      "id": "cat_15q82ls",
+      "name": "中文考試溫習天地",
+      "mascot": "owl",
+      "links": [
+        {
+          "title": "詞語溫習簿",
+          "desc": "第一次考試考詞溫習2",
+          "url": "https://merry-dango-54fc54.netlify.app/"
+        },
+        {
+          "title": "詞語奇遇記",
+          "desc": "第一次考詞範圍溫習",
+          "url": "https://proeil.github.io/p6-word-adventure/"
+        },
+        {
+          "title": "成語偵探社（第一次考試范圍1-20）",
+          "desc": "第一次考試成語范圍1-20",
+          "url": "https://tcpsmathtest.my.canva.site/ckeszpt4x067f3kv"
+        },
+        {
+          "title": "辨析比喻",
+          "desc": "worldwall",
+          "url": "https://wordwall.net/resource/105918030?wwmethod=link",
+          "more": [
+            {
+              "label": "",
+              "url": "https://wordwall.net/resource/62090011?wwmethod=link"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "name": "生命教育",
+      "mascot": "panda",
+      "links": [
+        {
+          "title": "我的小技能",
+          "desc": "請把你這個月學會的小技能上傳上padlet，與其他同學分享！",
+          "url": "https://padlet.com/swlam2/padlet-s023poehc5gkd347d57o"
+        }
+      ]
+    },
+    {
+      "id": "cat_pr6ggk0",
+      "name": "升中資訊站",
+      "mascot": "star",
+      "links": []
+    },
+    {
+      "id": "toolbox",
+      "name": "工具箱",
+      "mascot": "fox",
+      "links": [
+        {
+          "title": "香港天文台",
+          "desc": "查天氣同溫度",
+          "url": "https://www.hko.gov.hk"
+        },
+        {
+          "title": "Google 翻譯",
+          "desc": "中英文互譯",
+          "url": "https://translate.google.com"
+        },
+        {
+          "title": "香港小學習字表",
+          "desc": "",
+          "url": "https://www.edbchinese.hk/lexlist_ch/"
+        },
+        {
+          "title": "學校網頁",
+          "desc": "",
+          "url": "https://www.tcps.edu.hk/"
+        },
+        {
+          "title": "Gemini",
+          "desc": "***AI只是工具，不要讓它代替你思考！",
+          "url": "https://gemini.google.com/app"
+        }
+      ]
+    }
+  ],
+  "theme": "night"
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var MASCOTS = {
+    bear: { bg: "#FBE6E6", accent: "#C9776B",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="18" r="9" fill="#C99B7B"/><circle cx="48" cy="18" r="9" fill="#C99B7B"/><circle cx="16" cy="18" r="4" fill="#F3DFC9"/><circle cx="48" cy="18" r="4" fill="#F3DFC9"/><circle cx="32" cy="36" r="22" fill="#C99B7B"/><ellipse cx="32" cy="42" rx="11" ry="9" fill="#F3E4D2"/><circle cx="32" cy="39" r="3" fill="#6B4B36"/><circle cx="24" cy="33" r="2.4" fill="#4A3527"/><circle cx="40" cy="33" r="2.4" fill="#4A3527"/><path d="M27 46 Q32 50 37 46" stroke="#6B4B36" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>' },
+    rabbit: { bg: "#E3F1FB", accent: "#5B8FBF",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="22" cy="14" rx="5" ry="14" fill="#FFFFFF" stroke="#DCE6EC"/><ellipse cx="42" cy="14" rx="5" ry="14" fill="#FFFFFF" stroke="#DCE6EC"/><ellipse cx="22" cy="15" rx="2.2" ry="9" fill="#F3C6D0"/><ellipse cx="42" cy="15" rx="2.2" ry="9" fill="#F3C6D0"/><circle cx="32" cy="38" r="20" fill="#FFFFFF" stroke="#DCE6EC"/><circle cx="25" cy="35" r="2.2" fill="#3E6690"/><circle cx="39" cy="35" r="2.2" fill="#3E6690"/><ellipse cx="32" cy="43" rx="3" ry="2" fill="#F3C6D0"/><path d="M27 47 Q32 50 37 47" stroke="#5B8FBF" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>' },
+    cat: { bg: "#DFF3F1", accent: "#3E9E93",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M14 10 L24 24 L10 24 Z" fill="#FFFFFF" stroke="#DCE6EC"/><path d="M50 10 L40 24 L54 24 Z" fill="#FFFFFF" stroke="#DCE6EC"/><path d="M17 14 L22 21 L13 21 Z" fill="#F3C6D0"/><path d="M47 14 L42 21 L51 21 Z" fill="#F3C6D0"/><circle cx="32" cy="38" r="20" fill="#FFFFFF" stroke="#DCE6EC"/><circle cx="25" cy="36" r="2.2" fill="#3E9E93"/><circle cx="39" cy="36" r="2.2" fill="#3E9E93"/><path d="M30 42 Q32 44 34 42" stroke="#3E9E93" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M14 40 L24 39 M14 44 L24 42 M50 40 L40 39 M50 44 L40 42" stroke="#DCE6EC" stroke-width="1.3" stroke-linecap="round"/></svg>' },
+    owl: { bg: "#E4F5EA", accent: "#4F9E71",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M14 22 L22 10 L26 20 Z" fill="#C9A46A"/><path d="M50 22 L42 10 L38 20 Z" fill="#C9A46A"/><ellipse cx="32" cy="36" rx="20" ry="22" fill="#C9A46A"/><ellipse cx="32" cy="38" rx="15" ry="16" fill="#EFE3CB"/><circle cx="24" cy="34" r="7" fill="#FFFFFF"/><circle cx="40" cy="34" r="7" fill="#FFFFFF"/><circle cx="24" cy="34" r="3.2" fill="#4F9E71"/><circle cx="40" cy="34" r="3.2" fill="#4F9E71"/><path d="M32 40 L28 46 L36 46 Z" fill="#D98A3D"/></svg>' },
+    fox: { bg: "#FBEED0", accent: "#D98A3D",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M10 8 L26 22 L14 26 Z" fill="#E8A15C"/><path d="M54 8 L38 22 L50 26 Z" fill="#E8A15C"/><circle cx="32" cy="36" r="21" fill="#E8A15C"/><path d="M18 40 Q32 56 46 40 Q40 48 32 48 Q24 48 18 40 Z" fill="#FBF3E7"/><circle cx="25" cy="33" r="2.4" fill="#5A3A20"/><circle cx="39" cy="33" r="2.4" fill="#5A3A20"/><path d="M30 39 L34 39 L32 43 Z" fill="#5A3A20"/></svg>' },
+    panda: { bg: "#ECEAF3", accent: "#6B6F8A",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="18" r="9" fill="#3A3A3F"/><circle cx="48" cy="18" r="9" fill="#3A3A3F"/><circle cx="32" cy="36" r="22" fill="#FFFFFF" stroke="#E7E5EA"/><ellipse cx="23" cy="33" rx="7" ry="9" fill="#3A3A3F" transform="rotate(-12 23 33)"/><ellipse cx="41" cy="33" rx="7" ry="9" fill="#3A3A3F" transform="rotate(12 41 33)"/><circle cx="23" cy="34" r="2.2" fill="#FFFFFF"/><circle cx="41" cy="34" r="2.2" fill="#FFFFFF"/><ellipse cx="32" cy="42" rx="3" ry="2" fill="#3A3A3F"/></svg>' },
+    star: { bg: "#F5E9F7", accent: "#9B6EA8",
+      svg: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 8 L38 26 L57 26 L42 37 L48 55 L32 44 L16 55 L22 37 L7 26 L26 26 Z" fill="#CBA3D9"/><circle cx="26" cy="30" r="2" fill="#6C4A78"/><circle cx="38" cy="30" r="2" fill="#6C4A78"/><path d="M28 38 Q32 41 36 38" stroke="#6C4A78" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>' }
+  };
+
+  function readData() {
+    try {
+      var data = JSON.parse(document.getElementById("site-data").textContent);
+      if (!data || !Array.isArray(data.categories)) throw new Error("bad data");
+      return data;
+    } catch (e) { return { siteTitle: "6D 網址傳送門", siteSubtitle: "", categories: [] }; }
+  }
+  var state = readData();
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function hostOf(url) { try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; } }
+  function mascotOf(cat) { return MASCOTS[cat.mascot] || MASCOTS.star; }
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+  document.getElementById("siteTitle").textContent = state.siteTitle || "6D 網址傳送門";
+  document.getElementById("siteSubtitle").textContent = state.siteSubtitle || "";
+  document.title = state.siteTitle || "6D 網址傳送門";
+
+  var THEMES = {
+    meadow: { ground: ["🌼","🌷","🍄","🌸","🌼"], sky: ["☁️","🦋","✨"] },
+    ocean: { ground: ["🐚","🦀","⭐","🐚","🌴"], sky: ["🐦","☁️","🫧"] },
+    candy: { ground: ["🍭","🧁","🍓","🍩","🍬"], sky: ["✨","🎀","🍬"] },
+    night: { ground: ["🌙","🦉","🍄","⭐","🌙"], sky: ["⭐","✨","🌟"] },
+    autumn: { ground: ["🍁","🍂","🌰","🎃","🍁"], sky: ["🍃","🍂","🐿️"] }
+  };
+  var themeKey = THEMES[state.theme] ? state.theme : "meadow";
+  document.documentElement.setAttribute("data-portal-theme", themeKey);
+  THEMES[themeKey].ground.forEach(function (e) { document.getElementById("groundDecor").appendChild(el("span", null, e)); });
+  THEMES[themeKey].sky.forEach(function (e, i) {
+    var f = el("span", "float", e);
+    f.style.left = (16 + i * 26) + "%"; f.style.top = (46 + (i % 2) * 24) + "px"; f.style.animationDelay = (i * .8) + "s";
+    document.getElementById("skyDecor").appendChild(f);
+  });
+
+  var critterBox = document.getElementById("critters");
+  var critterKeys = state.categories.slice(0, 3).map(function (c) { return c.mascot; });
+  if (!critterKeys.length) critterKeys = ["bear", "rabbit", "owl"];
+  critterKeys.forEach(function (k) { critterBox.appendChild(el("div", "critter", (MASCOTS[k] || MASCOTS.star).svg)); });
+
+  var jumprow = document.getElementById("jumprow");
+  var sectionsHost = document.getElementById("sections");
+  var entries = [], secs = [];
+
+  if (!state.categories.length) sectionsHost.appendChild(el("p", "empty", "尚未設定任何科目。"));
+
+  function buildCard(cat, m, link) {
+    var a = el("a", "card");
+    a.href = link.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    if (link.tip) a.title = link.tip;
+    a.appendChild(el("span", "card-icon", m.svg));
+    var body = el("div", "card-body");
+    body.appendChild(el("p", "card-title", esc(link.title || "未命名連結")));
+    if (link.desc) body.appendChild(el("p", "card-desc", esc(link.desc)));
+    body.appendChild(el("p", "card-host", esc(hostOf(link.url))));
+    a.appendChild(body);
+    var more = (link.more || []).filter(function (x) { return x && x.url; });
+    if (!more.length) return a;
+    var wrap = el("div", "card-wrap");
+    wrap.appendChild(a);
+    var row = el("div", "card-more");
+    var first = el("a", "pill", esc(link.label || "連結 1"));
+    first.href = link.url; first.target = "_blank"; first.rel = "noopener noreferrer";
+    row.appendChild(first);
+    more.forEach(function (x, i) {
+      var pill = el("a", "pill", esc(x.label || ("連結 " + (i + 2))));
+      pill.href = x.url; pill.target = "_blank"; pill.rel = "noopener noreferrer";
+      row.appendChild(pill);
+    });
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  state.categories.forEach(function (cat) {
+    var m = mascotOf(cat);
+    var jbtn = el("button", "jumpbtn");
+    jbtn.type = "button";
+    jbtn.style.setProperty("--cat-bg", m.bg);
+    jbtn.appendChild(el("span", "jicon", m.svg));
+    jbtn.appendChild(document.createTextNode(cat.name));
+    jbtn.addEventListener("click", function () {
+      var t = document.getElementById("sec_" + cat.id);
+      if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    jumprow.appendChild(jbtn);
+
+    var sec = el("section", "subject");
+    sec.id = "sec_" + cat.id;
+    sec.style.setProperty("--cat-accent", m.accent);
+    sec.style.setProperty("--cat-bg", m.bg);
+    var head = el("div", "subject-head");
+    head.appendChild(el("span", "micon", m.svg));
+    head.appendChild(el("h2", null, esc(cat.name)));
+    var countEl = el("span", "count", "");
+    head.appendChild(countEl);
+    sec.appendChild(head);
+
+    var cards = el("div", "cards");
+    var links = cat.links || [];
+    var emptyEl = null;
+    if (!links.length) { emptyEl = el("p", "empty", "這個分類暫時未有連結。"); cards.appendChild(emptyEl); }
+    var idx = secs.length;
+    links.forEach(function (link) {
+      var node = buildCard(cat, m, link);
+      var more = (link.more || []).map(function (x) { return (x && x.label) || ""; }).join(" ");
+      entries.push({ node: node, i: idx, text: [link.title, link.desc, link.tip, link.label, more, cat.name, hostOf(link.url)].join(" ").toLowerCase() });
+      cards.appendChild(node);
+    });
+    sec.appendChild(cards);
+    sectionsHost.appendChild(sec);
+    secs.push({ sec: sec, countEl: countEl, emptyEl: emptyEl });
+  });
+
+  var input = document.getElementById("searchInput");
+  var info = document.getElementById("resultInfo");
+  var none = document.getElementById("noResult");
+  function applySearch() {
+    var q = input.value.trim().toLowerCase();
+    var terms = q ? q.split(/\s+/) : [];
+    var shown = secs.map(function () { return 0; }), total = 0;
+    entries.forEach(function (e) {
+      var ok = terms.every(function (t) { return e.text.indexOf(t) > -1; });
+      e.node.hidden = !ok;
+      if (ok) { shown[e.i]++; total++; }
+    });
+    secs.forEach(function (s, i) {
+      s.countEl.textContent = shown[i] + " 項資源";
+      s.sec.hidden = !!q && shown[i] === 0;
+      if (s.emptyEl) s.emptyEl.hidden = !!q;
+    });
+    info.textContent = q ? "找到 " + total + " 項資源" : "";
+    info.hidden = !q;
+    none.hidden = !(q && total === 0);
+  }
+  input.addEventListener("input", applySearch);
+  applySearch();
+  document.getElementById("toTop").addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+})();
+</script>
+</body>
+</html>
