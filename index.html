@@ -86,6 +86,13 @@
   .card-title { font-family: var(--font-body); font-weight: 700; font-size: 17px; color: var(--ink); margin: 0 0 2px; line-height: 1.35; }
   .card-desc { font-size: 13px; color: var(--ink-soft); margin: 0 0 3px; line-height: 1.5; }
   .card-host { font-size: 11px; color: var(--ink-soft); opacity: .75; }
+  .card-wrap { display: flex; flex-direction: column; gap: 10px; border-radius: 20px; padding: 10px; background: var(--cat-bg, #EFEFEF); box-shadow: 0 3px 0 rgba(0,0,0,.05), 0 6px 14px rgba(0,0,0,.06); }
+  .card-wrap .card { box-shadow: none; background: transparent; padding: 6px 6px 2px; }
+  .card-wrap .card:active { box-shadow: none; }
+  .card-more { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 6px 6px; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 8px 18px; border-radius: 24px; background: rgba(255,255,255,.75); color: var(--ink); font-family: var(--font-body); font-weight: 700; font-size: 14.5px; text-decoration: none; border: 2px solid var(--cat-accent, var(--focus)); box-shadow: 0 2px 0 rgba(0,0,0,.05); }
+  .pill:active { transform: translateY(2px); box-shadow: none; }
+  .pill:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
   .empty { grid-column: 1 / -1; color: var(--ink-soft); font-size: 14px; padding: 4px 2px; }
 
@@ -174,7 +181,13 @@
         {
           "title": "辨析比喻",
           "desc": "worldwall",
-          "url": "https://wordwall.net/resource/105918030?wwmethod=link"
+          "url": "https://wordwall.net/resource/105918030?wwmethod=link",
+          "more": [
+            {
+              "label": "",
+              "url": "https://wordwall.net/resource/62090011?wwmethod=link"
+            }
+          ]
         }
       ]
     },
@@ -319,7 +332,25 @@
         if (link.desc) body.appendChild(el("p", "card-desc", esc(link.desc)));
         body.appendChild(el("p", "card-host", esc(hostOf(link.url))));
         a.appendChild(body);
-        cards.appendChild(a);
+
+        var more = (link.more || []).filter(function (x) { return x && x.url; });
+        if (!more.length) {
+          cards.appendChild(a);
+        } else {
+          var wrap = el("div", "card-wrap");
+          wrap.appendChild(a);
+          var row = el("div", "card-more");
+          var firstPill = el("a", "pill", esc(link.label || "連結 1"));
+          firstPill.href = link.url; firstPill.target = "_blank"; firstPill.rel = "noopener noreferrer";
+          row.appendChild(firstPill);
+          more.forEach(function (x, i) {
+            var pill = el("a", "pill", esc(x.label || ("連結 " + (i + 2))));
+            pill.href = x.url; pill.target = "_blank"; pill.rel = "noopener noreferrer";
+            row.appendChild(pill);
+          });
+          wrap.appendChild(row);
+          cards.appendChild(wrap);
+        }
       });
     }
     sec.appendChild(cards);
