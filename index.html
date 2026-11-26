@@ -180,6 +180,15 @@
   .cards .empty { border: 2px dashed var(--border); border-radius: 16px; padding: 18px; text-align: center; }
   .noresult { text-align: center; color: var(--ink-soft); padding: 30px 20px; }
   .totop { margin-top: 14px; min-height: 48px; padding: 8px 26px; border-radius: 26px; border: 1.5px solid var(--border); background: var(--surface); color: var(--ink); font-family: var(--font-body); font-size: 15px; cursor: pointer; }
+
+  .memory { max-width: 760px; margin: 38px auto 0; padding: 0 20px; text-align: center; }
+  .memory h2 { font-family: var(--font-display); font-size: 21px; margin: 0; color: var(--ink); }
+  .photo-frame { margin: 14px 0 0; padding: 10px 10px 14px; background: #fff; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  .photo-btn { display: block; width: 100%; padding: 0; border: none; background: none; cursor: zoom-in; }
+  .photo-btn img { width: 100%; height: auto; border-radius: 8px; }
+  .photo-frame figcaption { padding-top: 10px; font-size: 14.5px; color: #6F625A; }
+  .lightbox { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.88); cursor: zoom-out; padding: 10px; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -211,6 +220,15 @@
   <nav class="jumprow" id="jumprow"></nav>
   <div id="sections"></div>
   <p class="noresult" id="noResult" hidden>暫時找不到相關資源，請試試其他關鍵字。</p>
+
+  <section class="memory" id="memory" hidden>
+    <h2>🌟 班級回憶</h2>
+    <figure class="photo-frame">
+      <button type="button" class="photo-btn" id="photoBtn" aria-label="放大班相"><img id="classPhoto" alt="班級合照"></button>
+      <figcaption id="photoCaption"></figcaption>
+    </figure>
+  </section>
+  <div class="lightbox" id="lightbox" hidden><img id="lightboxImg" alt="班級合照"></div>
 
   <p class="footer-note">祝大家學習愉快！🌈 每天進步一點點 ⭐</p>
   <div style="text-align:center"><button class="totop" id="toTop" type="button">回到頁首</button></div>
@@ -407,6 +425,16 @@
   };
   var themeKey = THEMES[state.theme] ? state.theme : "meadow";
   document.documentElement.setAttribute("data-portal-theme", themeKey);
+  if (state.photo) {
+    var memory = document.getElementById("memory"), photo = document.getElementById("classPhoto");
+    photo.onerror = function () { memory.hidden = true; };
+    photo.onload = function () { memory.hidden = false; };
+    photo.src = state.photo;
+    document.getElementById("photoCaption").textContent = state.photoCaption || "";
+    var box = document.getElementById("lightbox");
+    document.getElementById("photoBtn").addEventListener("click", function () { document.getElementById("lightboxImg").src = state.photo; box.hidden = false; });
+    box.addEventListener("click", function () { box.hidden = true; });
+  }
   THEMES[themeKey].ground.forEach(function (e) { document.getElementById("groundDecor").appendChild(el("span", null, e)); });
   THEMES[themeKey].sky.forEach(function (e, i) {
     var f = el("span", "float", e);
